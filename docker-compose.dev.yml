@@ -36,7 +36,7 @@ services:
     volumes:
       - ./extractor-service:/src
       - extractor_node_modules:/src/node_modules
-      - clones-data:/clones
+      - clones-data:/src/src/clones
     ports:
       - "8003:3000"
     env_file:
@@ -53,7 +53,7 @@ services:
     volumes:
       - ./routing-service:/src
       - routing_node_modules:/src/node_modules
-      - clones-data:/clones
+      - clones-data:/src/src/clones
     ports:
       - "8004:3000"
     env_file:
@@ -70,7 +70,7 @@ services:
     volumes:
       - ./backend-service:/src
       - backend_node_modules:/src/node_modules
-      - clones-data:/clones
+      - clones-data:/src/src/clones
     ports:
       - "8005:3000"
     env_file:
@@ -88,7 +88,9 @@ services:
     volumes:
       - ./extractor-service:/src
       - extractor_node_modules:/src/node_modules
-      - clones-data:/clones
+      - clones-data:/src/src/clones
+    env_file:
+      - ./extractor-service/.env
     networks:
       - veren
     depends_on:
@@ -96,14 +98,16 @@ services:
 
   build-worker:
     build:
-      context: ./extractor-service
+      context: ./backend-service
       dockerfile: Dockerfile.dev
     container_name: build-worker
     command: [ "npm", "run", "build:worker" ]
     volumes:
-      - ./extractor-service:/src
-      - extractor_node_modules:/src/node_modules
-      - clones-data:/clones
+      - ./backend-service:/src
+      - backend_node_modules:/src/node_modules
+      - clones-data:/src/src/clones
+    env_file:
+      - ./backend-service/.env
     networks:
       - veren
     depends_on:

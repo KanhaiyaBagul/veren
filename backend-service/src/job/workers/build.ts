@@ -1,9 +1,8 @@
 import { Worker } from "bullmq";
 import { Redis } from "ioredis";
 import logger from "../../logger/logger.js";
-import axios from "axios";
 import { buildFrontend } from "../../services/distributionHandler/BuildDistFolder.js";
-import { uploadToS3 } from "../../services/S3/UploadRepositoryToS3.js";
+import { uploadToS3 } from "../../utils/S3/UploadRepositoryToS3.js";
 import fs from "fs"
 
 const connection = new Redis({
@@ -66,19 +65,6 @@ worker.on('completed', async (job, result) => {
             return;
         }
 
-        await safeExecute(
-            () => axios.post(
-                "http://backend-service:3000/api/v1/operational",
-                {
-                    id: projectId,
-                    baseDir,
-                    backendDir,
-                    frontendDir
-                },
-                { timeout: 10000 }
-            ),
-            null
-        );
         logger.info(`Job ${job.id} completed successfully`);
 
     } catch (error) {
@@ -97,3 +83,7 @@ process.on('uncaughtException', (err) => {
 process.on('unhandledRejection', (reason) => {
     logger.error("Unhandled promise rejection in worker:", reason);
 });
+
+
+
+

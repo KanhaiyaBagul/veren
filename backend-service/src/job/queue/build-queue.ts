@@ -6,5 +6,5 @@ const connection = new Redis({
 })
 
 export const buildQueue = new Queue('buildQueue', { connection });
-await buildQueue.obliterate({ force: true });
+// await buildQueue.obliterate({ force: true });
 console.log("Queue cleared!");

@@ -1,6 +1,6 @@
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import path from "path";
-import readDirRecursive from "../../utils/readDirRecursive.js";
+import readDirRecursive from "./readDirRecursive.js";
 import fs from "fs";
 import mime from "mime-types";
 import { fileURLToPath } from "url";
@@ -27,8 +27,9 @@ function chunkArray<T>(arr: T[], size: number): T[][] {
 
 async function uploadToS3(directoryPathToRepo: string, projectId: string) {
     try {
-        const RepoFolderPath = path.join(__dirname, "../../../clones", projectId, 'frontend','dist');
-
+        const RepoFolderPath = path.join(__dirname, "../../clones", projectId, 'frontend','dist');
+        console.log("Uploading repository from:", RepoFolderPath);
+        console.log("To :", RepoFolderPath);
         const files = readDirRecursive(RepoFolderPath);
 
         const batches = chunkArray(files, 5);

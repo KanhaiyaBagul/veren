@@ -29,7 +29,7 @@ export default async function urlController(req: Request, res: Response) {
     // }
 
     // Generate UUID and push new entry
-    const id: string = nanoid(8);
+    const id: string = nanoid(24).toLowerCase();
     // data.push({ id, url, token });
 
     // // Write back to file

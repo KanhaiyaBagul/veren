@@ -1,10 +1,10 @@
 import { Worker } from "bullmq";
 import { Redis } from "ioredis";
 import logger from "../../logger/logger.js";
-import { buildQueue } from "../queue/build-queue.js";
 import { cloneRepo } from "../../services/GitHandler/gitHandler.js";
 import { CloneResult, CloneSkipped } from "../../types/clone.js";
 import { safeExecute } from "../../types/index.js";
+import axios from "axios";
 
 const connection = new Redis({
     maxRetriesPerRequest: null,
@@ -51,24 +51,20 @@ worker.on('completed', async (job, result) => {
             logger.error("DATA MISSING ON CLONE COMPLETE");
             return;
         }
-
+  
         logger.info(`Job ${job.id} completed`);
 
-        // Queue build job
         await safeExecute(
-            async () => {
-                await buildQueue.add(
-                    "buildQueue",
-                    { ...result },
-                    {
-                        attempts: 3,
-                        backoff: {
-                            type: "exponential",
-                            delay: 5000,
-                        },
-                    }
-                )
-            }, null);
+            () => axios.post(
+                "http://backend-service:3000/api/v1/operational",
+                {
+                    ...result
+                },
+                { timeout: 10000 }
+            ),
+            null
+        );
+       
     } catch (error) {
         logger.error("Error in completed handler:", error);
 

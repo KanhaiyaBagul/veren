@@ -6,5 +6,5 @@ const connection = new Redis({
 })
 
 export const cloneQueue = new Queue('cloneQueue', { connection });
-await cloneQueue.obliterate({ force: true });
+// await cloneQueue.obliterate({ force: true });
 console.log("Queue cleared!");

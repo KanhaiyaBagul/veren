@@ -1,10 +1,8 @@
 import {simpleGit} from "simple-git";
 import path from "path";
 import fs from "fs";
-import { uploadToS3 } from "../S3/UploadRepositoryToS3.js";
 import { fileURLToPath } from "url";
 import { folderCheck } from "./PathCheck.js";
-import { buildFrontend } from "../distributionHandler/BuildDistFolder.js";
 import logger from "../../logger/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
