@@ -8,8 +8,9 @@ import logger from "../../logger/logger.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-export async function cloneRepo(repoUrl: string, frontend : string, backend: string, id: string, token:string) {
+export async function cloneRepo(repoUrl: string, id: string, token:string) {
     const projectId = id;
+    // Path to clones volume
     const baseDir = path.join(__dirname, '../../clones', projectId);
     if(fs.existsSync(baseDir)){
         logger.info("Directory already exists. Skipping clone for project:", projectId);
@@ -46,8 +47,12 @@ export async function cloneRepo(repoUrl: string, frontend : string, backend: str
         if(!fs.existsSync(frontendDir) && frontendCheck){
             logger.error("FRONTEND WAS NOT CLONED DUE TO GIT ERROR");
         }
-
-        return { projectId, baseDir, backendDir, frontendDir, cloneSkipped: false };
+        const dirPath = {
+            baseDir,
+            backendDir,
+            frontendDir
+        }
+        return { projectId, dirPath, cloneSkipped: false };
 
     } catch (error) {
         console.error(`Error cloning ${repoUrl} into ${baseDir}:`, error);
