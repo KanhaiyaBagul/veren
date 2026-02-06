@@ -1,18 +1,13 @@
-type CloneSuccess = {
+type CloneResult = {
     projectId: string;
-    cloneSkipped: false;
+
     frontendDir: string;
     backendDir: string;
     baseDir: string,
+
     commitHash:string; 
     commitMessage: string;
 }
-
-type CloneSkipped = {
-    projectId: string;
-    cloneSkipped: true;
-}
-
 
 type FrontendConfig = {
     frontendDir: string;
@@ -42,6 +37,5 @@ type noConfig = {
 }
 
 type RepoConfig = generatedConfig | noConfig
-type CloneResult = CloneSuccess | CloneSkipped;
 
-export { CloneSkipped, CloneSuccess, CloneResult, RepoConfig, generatedConfig };
+export { CloneResult, RepoConfig, generatedConfig };

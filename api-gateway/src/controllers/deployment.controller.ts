@@ -1,9 +1,15 @@
-import axios from "axios";
-import asyncHandler from "../utils/api-utils/asyncHandler.js";
 import { Request, Response } from "express";
+
+import asyncHandler from "../utils/api-utils/asyncHandler.js";
 import ApiError from "../utils/api-utils/ApiError.js";
-import Project from "../models/project.model.js";
-import Deployment from "../models/deployment.model.js";
+
+import { cloneQueue } from "../Queue/clone-queue.js";
+
+import logger from "../logger/logger.js";
+
+import { Project, DeploymentStatus, publilishEvent } from "@veren/domain";
+import { Deployment } from "@veren/domain";
+
 
 const deployProject = asyncHandler(async (req: Request, res: Response) => {
   const { projectId } = req.params;
@@ -28,8 +34,8 @@ const deployProject = asyncHandler(async (req: Request, res: Response) => {
   }
 
   const lastDeployment = await Deployment.findOne({ projectId })
-  .sort({ number: -1 })
-  .select("number");
+    .sort({ number: -1 })
+    .select("number");
 
   const nextNumber = lastDeployment ? lastDeployment.number + 1 : 1;
 
@@ -42,36 +48,58 @@ const deployProject = asyncHandler(async (req: Request, res: Response) => {
   })
 
   await Project.findByIdAndUpdate(
-  projectId,
-  {
-    $push: {
-      deployments: newDeployment._id 
-    },
-    $set: {
-      currentDeployment: newDeployment._id
-    }
-  }
-);
-
-  await axios.post(
-    "http://extractor-service:3000/api/v1/url",
+    projectId,
     {
-      projectId,
-      owner: userId,
-      deploymentId: newDeployment._id,
-      token: req.session.githubToken,
-      repoUrl: project?.git?.repoUrl,
-      dirPath: project?.repoPath,
-      build: project?.build
-    },
-    { timeout: 2000 }
+      $push: {
+        deployments: newDeployment._id
+      },
+      $set: {
+        currentDeployment: newDeployment._id
+      }
+    }
+  );
 
-  ).catch(error => {
-    throw new ApiError(500, `Extractor service failed: ${error}`);
-  });
+  try {
+    await cloneQueue.add(
+      "cloneQueue",
+      {
+        projectId,
+        owner: userId,
+        deploymentId: newDeployment._id,
+        token: req.session.githubToken,
+        repoUrl: project?.git?.repoUrl,
+        dirPath: project?.repoPath,
+        build: project?.build,
+      },
+      {
+        attempts: 1,
+        backoff: {
+          type: "exponential",
+          delay: 1000,
+        },
+        removeOnComplete: true,
+        removeOnFail: true,
+      }
+    );
 
-  return res.status(200).json({ message: "Deployment triggered successfully" });
+    logger.info(`Clone job added for project ${projectId}`);
 
+    publilishEvent({
+      type: DeploymentStatus.CREATED,
+      projectId: projectId,
+      deploymentId: newDeployment._id.toString(),
+      payload: {
+        owner: userId,
+        msg: "Queued for deployment."
+      }
+    })
+
+  } catch (error) {
+    logger.error(`Error while pushing to clone queue for projectId: `, projectId);
+    throw new ApiError(500, "Internal server error!");
+  }
+
+  return res.status(200).json({ message: "Deployment triggered successfully." });
 })
 
 const deployTo = asyncHandler(async (req: Request, res: Response) => {

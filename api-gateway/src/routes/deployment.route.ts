@@ -7,5 +7,9 @@ router.use(verifyJwt);
 
 router.route('/:projectId')
     .get(deployProject)
+router.route('/d/:projectId')
+    .post(deployProject)
+router.route('/r/:projectId')
+    .post(deployProject)
 
 export default router;

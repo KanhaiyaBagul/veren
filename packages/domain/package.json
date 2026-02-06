@@ -1,0 +1,19 @@
+{
+  "name": "@veren/domain",
+  "version": "0.0.1",
+  "private": true,
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sns": "^3.978.0",
+    "@aws-sdk/client-sqs": "^3.978.0",
+    "mongoose": "^8.0.0"
+  },
+  "devDependencies": {
+    "@types/mongoose": "^5.11.96",
+    "@types/node": "^25.1.0"
+  }
+}

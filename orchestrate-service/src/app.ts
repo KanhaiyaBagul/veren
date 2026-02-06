@@ -20,6 +20,9 @@ app.use(express.urlencoded({extended: true, limit: '16kb'}))
 app.use(cookieParser()); 
 app.use(express.static('public'));
 
+import containerRouter from "./routes/container.routes.js"
+
+app.use('/api/v1', containerRouter)
 
 app.use(errorHandler)
 

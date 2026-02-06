@@ -1,23 +1,21 @@
-# Use Node 20
+# Base image
 FROM node:20-bullseye
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json & tsconfig
-COPY package*.json tsconfig.json ./
+COPY package*.json ./
+COPY package-lock.json ./
 
-# Install dependencies
-RUN npm install --production
+COPY packages ./packages
+COPY api-gateway ./api-gateway
 
-# Copy source files
-COPY . .
+RUN npm install --workspaces --legacy-peer-deps
 
-# Compile TypeScript to JS
-RUN npm run build
+# Build the workspace you care about
+RUN npm run build --workspace=api-gateway
 
-# Expose the port
+# Expose port if needed
 EXPOSE 3000
 
-# Run compiled JS
-CMD ["npm", "start"]
+# Run the worker using npm workspace
+CMD ["npm", "start", "--workspace=api-gateway"]

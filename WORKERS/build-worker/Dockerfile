@@ -1,16 +1,18 @@
+# Base image
 FROM node:20-bullseye
 
-WORKDIR /src
+WORKDIR /app
 
-# Install deps (include devDependencies since we need nodemon + ts-node inside container)
 COPY package*.json ./
-COPY tsconfig.json ./
+COPY package-lock.json ./
 
-# Copy everything else
-COPY . .
+COPY WORKERS/build-worker ./WORKERS/build-worker
+COPY packages ./packages
 
-# Default port (will be overridden by docker-compose)
+RUN npm install --workspaces --legacy-peer-deps
+
+RUN npm run build --workspace=WORKERS/build-worker
+
 EXPOSE 3000
 
-# Run dev server with nodemon + ts-node/esm
-CMD ["sh", "-c", "npm install && npm run build:worker"]
+CMD ["npm", "start", "--workspace=WORKERS/build-worker"]

@@ -1,9 +1,7 @@
-// Env changes should trigger redeploys
-
 import { Request, Response } from "express";
 import asyncHandler from "../utils/api-utils/asyncHandler.js";
 import ApiError from "../utils/api-utils/ApiError.js";
-import Project from "../models/project.model.js";
+import {Project} from "@veren/domain";
 
 const updateEnv = asyncHandler(async (req: Request, res: Response) => {
     const { projectId } = req.params;
