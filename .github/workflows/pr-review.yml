@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    if: github.actor != 'atithi4dev'
     
     steps:
       - name: Checkout code
@@ -57,7 +58,7 @@ jobs:
               
               comment += '\n**Valid Types:** feat, fix, docs, style, refactor, perf, test, chore\n';
               comment += '**Example:** `feat(issue-45): add new authentication endpoint`\n';
-              comment += '\nPlease see [CONTRIBUTING.md](../../CONTRIBUTING.md#commit-guidelines) for detailed guidelines.';
+              comment += `\nPlease see [CONTRIBUTING.md](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/Docs/CONTRIBUTING.md#commit-guidelines) for detailed guidelines.`;
               
               github.rest.issues.createComment({
                 issue_number: context.issue.number,
@@ -80,6 +81,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    if: github.actor != 'atithi4dev'
     
     steps:
       - name: Validate PR Description
@@ -129,6 +131,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    if: github.actor != 'atithi4dev'
     
     steps:
       - name: Check Target Branch
@@ -158,7 +161,7 @@ jobs:
                 issue_number: pr.number,
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                body: `🚫 **Branch Protection:** This PR targets \`main\`. All changes must go through the \`test\` branch first.\n\n**Action Required:**\n1. Close this PR\n2. Create a new PR targeting the \`test\` branch\n3. Once merged to \`test\`, create a release PR from \`test\` to \`main\`\n\n**Note:** Only authorized admins can create PRs to \`main\`.\n\nSee [CONTRIBUTING.md](../../Docs/CONTRIBUTING.md) for details.`
+                body: `🚫 **Branch Protection:** This PR targets \`main\`. All changes must go through the \`test\` branch first.\n\n**Action Required:**\n1. Close this PR\n2. Create a new PR targeting the \`test\` branch\n3. Once merged to \`test\`, create a release PR from \`test\` to \`main\`\n\n**Note:** Only authorized admins can create PRs to \`main\`.\n\nSee [CONTRIBUTING.md](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/Docs/CONTRIBUTING.md) for details.`
               });
             }
 
@@ -168,6 +171,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    if: github.actor != 'atithi4dev'
     
     steps:
       - name: Check Related Issues
@@ -203,14 +207,14 @@ jobs:
                     issue_number: pr.number,
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    body: `⚠️ **Issue Not Assigned:** Issue #${issueNum} is referenced but not assigned to anyone.\n\nPlease ensure the issue is assigned using \`/assign @username\` in the issue discussion.\n\nSee [CONTRIBUTING.md](../../CONTRIBUTING.md) for assignment workflow.`
+                    body: `⚠️ **Issue Not Assigned:** Issue #${issueNum} is referenced but not assigned to anyone.\n\n**Action required:**\nOpen issue #${issueNum} and comment expressing interest: "I'd like to work on this"\n\nA maintainer will review and assign it to you using the \`/assign @username\` command.\n\nSee [CONTRIBUTING.md](../../Docs/CONTRIBUTING.md#step-2-request-assignment) for details.`
                   });
                 } else {
                   github.rest.issues.createComment({
                     issue_number: pr.number,
                     owner: context.repo.owner,
                     repo: context.repo.repo,
-                    body: `✅ **Issue Assignment Verified:** PR correctly references assigned issue #${issueNum} (@${issue.assignee.login}).`
+                    body: `✅ **Issue Assignment Verified:** PR correctly references assigned issue #${issueNum} (assigned to @${issue.assignee.login}).`
                   });
                 }
               } catch (error) {

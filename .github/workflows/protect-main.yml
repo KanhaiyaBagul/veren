@@ -8,6 +8,7 @@ jobs:
   protect-main:
     runs-on: ubuntu-latest
     name: Enforce PR Target Branch
+    if: github.actor != 'atithi4dev'
     
     steps:
       - name: Check PR Target Branch
@@ -42,7 +43,7 @@ jobs:
               issue_number: pr.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🚫 **Branch Protection:** This PR targets \`main\`. All changes must go through the \`test\` branch first.\n\n**Action Required:**\n1. Close this PR\n2. Create a new PR targeting the \`test\` branch\n3. Once merged to \`test\`, create a release PR from \`test\` to \`main\`\n\n**Note:** Only authorized admins can create PRs directly to \`main\`.\n\nSee [CONTRIBUTING.md](../../Docs/CONTRIBUTING.md) for details.`
+              body: `🚫 **Branch Protection:** This PR targets \`main\`. All changes must go through the \`test\` branch first.\n\n**Action Required:**\n1. Close this PR\n2. Create a new PR targeting the \`test\` branch\n3. Once merged to \`test\`, create a release PR from \`test\` to \`main\`\n\n**Note:** Only authorized admins can create PRs directly to \`main\`.\n\nSee [CONTRIBUTING.md](https://github.com/${context.repo.owner}/${context.repo.repo}/blob/main/Docs/CONTRIBUTING.md) for details.`
             });
             core.setFailed('Unauthorized PR to main branch');
             process.exit(1);
@@ -68,6 +69,7 @@ jobs:
   validate-pr-content:
     runs-on: ubuntu-latest
     name: Validate PR Content
+    if: github.actor != 'atithi4dev'
     
     steps:
       - uses: actions/checkout@v4
@@ -105,6 +107,7 @@ jobs:
   assign-check:
     runs-on: ubuntu-latest
     name: Verify Assignment through /assign Command
+    if: github.actor != 'atithi4dev'
     
     steps:
       - name: Check if PR is assigned

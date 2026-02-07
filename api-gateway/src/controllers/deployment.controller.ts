@@ -102,6 +102,10 @@ const deployProject = asyncHandler(async (req: Request, res: Response) => {
   return res.status(200).json({ message: "Deployment triggered successfully." });
 })
 
+const roleBackProject = asyncHandler(async (req:Request, res: Response) =>{
+
+})
+
 const deployTo = asyncHandler(async (req: Request, res: Response) => {
   // const { projectId }= req.body;
   // const lastDeployment = await Deployment.findOne({ projectId })
@@ -110,5 +114,5 @@ const deployTo = asyncHandler(async (req: Request, res: Response) => {
 })
 
 export {
-  deployProject, deployTo
+  deployProject, deployTo, roleBackProject
 }
