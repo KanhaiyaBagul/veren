@@ -109,7 +109,7 @@ The GitHub automation system provides:
 ### 4. `code-quality.yml`
 **Purpose:** Verify code quality, run tests, and security audits
 
-**Triggers:** `pull_request` (all branches), `push` (develop branch)
+**Triggers:** `pull_request` (all branches), `push` (test branch)
 
 **Jobs:**
 - `lint-and-type-check` - Checks TypeScript compilation for all services
@@ -145,7 +145,7 @@ The GitHub automation system provides:
   - Type of Change section
   - Checklist
 
-- `prevent-direct-pushes` - Enforces PRs target `develop` branch, not `main`
+- `prevent-direct-pushes` - Enforces PRs target `test` branch, not `main`
 
 - `require-issue-assignment` - Verifies referenced issue is assigned to someone
 
@@ -266,7 +266,7 @@ To manually trigger label setup without waiting for issue event:
 1. Go to **Actions** tab
 2. Select **Auto-Manage Labels** workflow
 3. Click **Run workflow**
-4. Select branch (usually `develop`)
+4. Select branch (usually `test`)
 5. Click **Run workflow**
 
 ## Security Considerations
@@ -348,7 +348,7 @@ To improve workflows or governance:
 1. Create an issue describing the improvement
 2. Get assigned via `/assign`
 3. Make changes to `.github/` (including workflows, templates, or SECURITY.md)
-4. Create PR to `develop` branch
+4. Create PR to `test` branch
 5. Reference the issue
 6. Get review and merge
 
