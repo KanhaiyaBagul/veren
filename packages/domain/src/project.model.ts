@@ -16,12 +16,20 @@ const envSchema = new Schema(
 )
 
 const projectSchema = new Schema<IProject>({
+
     name: {
         type: String,
         required: true,
         unique: true,
         trim: true
     },
+
+    type: {
+        type: String,
+        enum: ["frontend", "backend"],
+        required: true
+    },
+
     git: {
         provider: {
             type: String,
@@ -38,86 +46,79 @@ const projectSchema = new Schema<IProject>({
         },
         rootDir: {
             type: String,
-            default: "/"
+            default: "./"
         },
     },
+
     envs: {
-        frontendEnv: {
-            type: [envSchema],
-            default: []
-        },
-        backendEnv: {
-            type: [envSchema],
-            default: [],
-        }
+        type: [envSchema],
+        default: []
     },
-    repoPath: {
-        frontendDirPath: {
-            type: String,
-            default: "./frontend"
-        },
-        backendDirPath: {
-            type: String,
-            default: "./backend"
-        }
+    entryDirectory: {
+        type: String,
+        default: "./"
     },
+
     domains: {
         subdomain: {
             type: String,
             unique: true,
         },
-        customDomain: {
-            type: String,
-        }
     },
-    build: {
+
+    frontendBuild: {
         framework: {
             type: String,
         },
-        frontendBuildCommand: {
+
+        installCommand: {
+            type: String,
+            default: "npm install"
+        },
+        buildCommand: {
             type: String,
             default: "npm run build"
         },
-        frontendInstallCommand: {
-            type: String,
-            default: "npm install"
-        },
-        backendInstallCommand: {
-            type: String,
-            default: "npm install"
-        },
-        backendStartCommand: {
-            type: String,
-            default: "npm start"
-        },
-        frontendOutDir: {
+        outDir: {
             type: String,
             default: "./build"
-        }
-    },
-    runtime: {
-        frontend: {
-            type: {
-                type: String,
-                enum: ["static", "server"],
-                default: "static",
-            },
-            port: Number
         },
-        backend: {
-            type: {
-                type: String,
-                enum: ["static", "server"],
-                default: "server"
-            },
-            port: Number
+        version: {
+            type: Number,
+            default: 20
         }
     },
+    backendBuild: {
+        installCommand: {
+            type: String,
+            default: "npm install"
+        },
+        runCommand: {
+            type: String,
+            default: "npm run build"
+        },
+        version: {
+            type: Number,
+            default: 20
+        }
+    },
+
+    runtime: {
+        rType: {
+            type: String,
+            enum: ["static", "server"],
+            default: "server"
+
+        },
+        port: Number
+    },
+
     status: {
         type: String,
         enum: ["active", "paused", "deleted"],
         default: "active",
     },
+
     deployments: [
         {
             type: Schema.Types.ObjectId,

@@ -11,9 +11,9 @@ export interface IDeployment {
     commitMessage?: string;
     buildLogsUrl?: string;
     frontendTaskArn: string;
-    backendTaskArn: string;
-    backendImageUrl: string;
-    backendECSContainerArn: string;
+    backendTaskArn?: string;
+    backendImageUrl?: string;
+    backendECSContainerArn?: string;
     artifactUrl?: string;
     error?: IError; 
     rollBackArtifactUrl?: string

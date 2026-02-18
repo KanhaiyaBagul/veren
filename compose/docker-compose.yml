@@ -1,40 +1,155 @@
-services:
-  api-gateway:
-    build:
-      context: ./api-gateway
-      dockerfile: ${DOCKERFILE:-Dockerfile}
-    container_name: api-gateway
-    ports:
-      - "8001:8001"
-    env_file:
-      - ./api-gateway/.env
-    networks:
-      - veren
-    depends_on:
-      - submission-service
+# services:
+#   api-gateway:
+#     build:
+#       context: .
+#       dockerfile: ./api-gateway/Dockerfile.dev
+#     container_name: api-gateway
+#     ports:
+#       - "8001:3000"
+#     env_file:
+#       - ./api-gateway/.env
+#     volumes:
+#       - ./packages/domain:/app/packages/domain
+#     networks:
+#       - veren
+#     depends_on:
+#       - internal-redis
 
-  submission-service:
-    build:
-      context: ./submission-service
-      dockerfile: ${DOCKERFILE:-Dockerfile}
-    container_name: submission-service
-    env_file:
-      - ./submission-service/.env
-    networks:
-      - veren
+#   routing-service:
+#     build:
+#       context: .
+#       dockerfile: ./routing-service/Dockerfile.dev
+#     container_name: routing-service
+#     volumes:
+#       - ./routing-service:/src
+#     ports:
+#       - "8004:3000"
+#     env_file:
+#       - ./routing-service/.env
+#     networks:
+#       - veren 
+#   orchestrate-service:
+#     build:
+#       context: .
+#       dockerfile: ./orchestrate-service/Dockerfile.dev
+#     container_name: orchestrate-service
+#     volumes:
+#       - ./orchestrate-service:/src
+#     ports:
+#       - "8005:3000"
+#     env_file:
+#       - ./orchestrate-service/.env
+#     command: [ "npm", "run", "dev" ]
+#     networks:
+#       - veren  
+#   notification-service:
+#     build:
+#       context: .
+#       dockerfile: ./notification-service/Dockerfile.dev
+#     container_name: notification-service
+#     volumes:
+#       - ./notification-service:/src
+#     ports:
+#       - "8007:3000"
+#     env_file:
+#       - ./notification-service/.env
+#     networks:
+#       - veren
 
-  extractor-service:
-    build:
-      context: ./extractor-service
-      dockerfile: ${DOCKERFILE:-Dockerfile}
-    container_name: extractor-service
-    env_file:
-      - ./extractor-service/.env
-    volumes:
-      - ./clones:/src/clones 
-    networks:
-      - veren
+#   frontend-build-worker:
+#     build:
+#       context: .
+#       dockerfile: ./WORKERS/frontend-build-worker/Dockerfile
+#     privileged: true
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#     env_file:
+#       - ./WORKERS/frontend-build-worker/.env
+#     networks:
+#       - veren
+#     depends_on:
+#       - internal-redis  
 
-networks:
-  veren:
-    external: true
+#   backend-build-worker:
+#     build:
+#       context: .
+#       dockerfile: ./WORKERS/backend-build-worker/Dockerfile
+#     privileged: true
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#     env_file:
+#       - ./WORKERS/backend-build-worker/.env
+#     networks:
+#       - veren
+#     depends_on:
+#       - internal-redis 
+#   backend-deploy-worker:
+#     build:
+#       context: .
+#       dockerfile: ./WORKERS/backend-deploy-worker/Dockerfile
+#     privileged: true
+#     volumes:
+#       - /var/run/docker.sock:/var/run/docker.sock
+#     env_file:
+#       - ./WORKERS/backend-deploy-worker/.env
+#     networks:
+#       - veren
+#     depends_on:
+#       - internal-redis
+
+#   internal-redis:
+#     image: redis:7
+#     container_name: notification_internal_redis
+#     restart: always
+#     networks:
+#       - veren
+#     volumes:
+#     - redis-data:/data
+
+# volumes:
+#   redis-data:
+
+# networks:
+#   veren:
+#     external: false
+
+
+
+#     version: "3.8"
+
+# services:
+
+#   nginx:
+#     image: nginx:alpine
+#     container_name: nginx
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - ./nginx.conf:/etc/nginx/nginx.conf
+#       - ./certbot/conf:/etc/letsencrypt
+#       - ./certbot/www:/var/www/certbot
+#     depends_on:
+#       - api-gateway
+#       - routing-service
+#     networks:
+#       - veren
+
+#   api-gateway:
+#     image: yourdockerhub/api-gateway:latest
+#     expose:
+#       - "3000"
+#     restart: always
+#     networks:
+#       - veren
+
+#   routing-service:
+#     image: yourdockerhub/routing-service:latest
+#     expose:
+#       - "3000"
+#     restart: always
+#     networks:
+#       - veren
+
+# networks:
+#   veren:
