@@ -4,12 +4,12 @@ import {
     DeleteMessageCommand,
 } from "@aws-sdk/client-sqs";
 
-import { repoAnalysisSuccessHandler } from "./controllers/internalService.controller.js";
+// import { repoAnalysisSuccessHandler } from "../controllers/internalService.controller.js";
 
 import dotenv from 'dotenv';
 import { Deployment, Project, publishEvent } from "@veren/domain";
-import { backendDeployQueue } from "./Queue/backendDeploy-queue.js";
-import ecrImageExistsCheck from "./utils/ecrCheck/ecrImageExistsCheck.js";
+import { backendDeployQueue } from "../Queue/backendDeploy-queue.js";
+import ecrImageExistsCheck from "../utils/ecrCheck/ecrImageExistsCheck.js";
 dotenv.config();
 
 const sqs = new SQSClient({
@@ -97,7 +97,7 @@ async function onRepoAnalysisSuccess(event: any) {
     const { projectId, deploymentId } = event;
     const { commitHash, commitMessage, config } = event.payload;
 
-    await repoAnalysisSuccessHandler(projectId, config, deploymentId, commitHash, commitMessage);
+    // await repoAnalysisSuccessHandler(projectId, config, deploymentId, commitHash, commitMessage);
 }
 
 async function AnalysisFailed(event: any) {
@@ -194,15 +194,13 @@ async function backendBuildSuccess(event: any) {
     const exist = await ecrImageExistsCheck(imageTag);
     if (exist) {
         const project = await Project.findById(projectId);
-
         await backendDeployQueue.add("backendDeployQueue", {
             deploymentId, 
             projectId,
             imageTag, 
-            installCommand: project?.build?.backendInstallCommand,
-            startCommand: project?.build?.backendStartCommand,
-            dirPath: project?.repoPath?.backendDirPath,
-            envs: project?.envs?.backendEnv
+            installCommand: project?.backendBuild.installCommand,
+            startCommand: project?.backendBuild.runCommand,
+            envs: project?.envs
         }, {
             attempts: 1,
             backoff: {
@@ -218,7 +216,7 @@ async function backendBuildSuccess(event: any) {
         })
     } else {
         // @support
-        // queue delete of current frontend deployment if exist
+        // queue delete of current deployment if exist
         await Deployment.findByIdAndUpdate(deploymentId, {
             status: "failed",
             finishedAt: new Date(),
@@ -241,7 +239,7 @@ async function frontendBuildFailed(event: any) {
             message: payload.msg,
         }
     })
-    // queue delete of current backend deployment if exist
+    // queue delete of current deployment if exist
 }
 async function backendBuildFailed(event: any) {
     const { deploymentId, payload } = event;
@@ -255,5 +253,4 @@ async function backendBuildFailed(event: any) {
         }
     })
     // queue delete of current backend deployment if exist
-    // fallback S3 object to previous state, remove pushed item, update db for s3 url
 }
