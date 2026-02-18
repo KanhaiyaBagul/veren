@@ -1,20 +1,12 @@
-# Use official Node.js LTS image
 FROM node:20-bullseye
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+RUN npm install --omit=dev
 
-# Install dependencies
-RUN npm install --production
-
-# Copy the rest of your backend code
 COPY . .
 
-# Expose the port your app listens on
-EXPOSE 3000
+ENV NODE_ENV=production
 
-# Start the application
-CMD ["npm", "start"]
+ENTRYPOINT sh -c "$START_CMD"

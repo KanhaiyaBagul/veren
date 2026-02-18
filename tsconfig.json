@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "outDir": "dist",
+    "rootDirs": ["."],
+    "baseUrl": ".",
+    "paths": {
+      "@veren/*": ["packages/*"]
+    },
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["api-gateway/**/*", "WORKERS/**/*", "packages/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
