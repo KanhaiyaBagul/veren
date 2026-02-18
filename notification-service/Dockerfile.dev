@@ -2,20 +2,17 @@ FROM node:20-bullseye
 
 WORKDIR /app
 
+COPY ./notification-service/kafka.pem kafka.pem
 COPY package*.json ./
-COPY tsconfig.json ./
-COPY kafka.pem kafka.pem
-RUN npm install
+COPY package-lock.json ./
 
-COPY . .
+COPY notification-service ./notification-service
+COPY packages ./packages
+
+RUN npm install --workspaces --legacy-peer-deps
+
+RUN npm run build --workspace=notification-service
 
 EXPOSE 3000
 
-# Compile TypeScript to JS
-RUN npm run build
-
-# Expose the port
-EXPOSE 3000
-
-# Run compiled JS
-CMD ["npm", "start"]
+CMD ["npm", "start", "--workspace=notification-service"]

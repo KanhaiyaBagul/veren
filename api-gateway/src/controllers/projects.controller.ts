@@ -1,87 +1,130 @@
 import { Request, Response } from "express";
-import {Project, IProject} from "@veren/domain";
+import { Project, IProject } from "@veren/domain";
 import ApiError from "../utils/api-utils/ApiError.js";
 import ApiResponse from "../utils/api-utils/ApiResponse.js";
 import asyncHandler from "../utils/api-utils/asyncHandler.js";
 import logger from "../logger/logger.js";
 
 /* THIS IS ONLY ACCESIBLE TO FRONTEND USER */
-const createProject = asyncHandler(async (req: Request, res: Response) => {
+const createFrontendProject = asyncHandler(async (req: Request, res: Response) => {
     const {
-        name,
-        repoUrl,
-        branch = "main",
-        frontendDirPath = "./frontend",
-        backendDirPath = "./backend",
-        frontendBuildCommand = "npm run build",
-        frontendInstallCommand = "npm install",
-        backendInstallCommand = "npm install",
-        backendStartCommand = "npm start",
-        frontendOutDir = "./build",
-    } = req.body;
-
-    if (!name || !repoUrl) {
-        throw new ApiError(400, "Name and repoUrl are required");
-    }
+        projectName,
+        type = "frontend",
+        gitUrl,
+        branch,
+        entryDirectory,
+        installCommand,
+        buildCommand,
+        buildOutDirectory,
+    version= "20" } = req.body;
 
     const projectData = {
-        name: name.toLowerCase(),
+        name: projectName.toLowerCase(),
+        type: type,
         git: {
             provider: "github",
-            repoUrl,
+            repoUrl: gitUrl,
             branch,
             rootDir: "./"
         },
-        repoPath: {
-            frontendDirPath,
-            backendDirPath
+        frontendBuild: {
+            framework: "",
+            installCommand,
+            buildCommand,
+            version,
+            outDir: buildOutDirectory,
         },
-        build: {
-            frontendBuildCommand,
-            frontendInstallCommand,
-            backendInstallCommand,
-            backendStartCommand,
-            frontendOutDir
-        },
+        entryDirectory,
+        envs: [],
         runtime: {
-            frontend: {
-                type: "static"
-            },
-            backend: {
-                type: "server",
-                port: 8080
-            }
-        },
-        envs: {
-            frontendEnv: [],
-            backendEnv: []
+            type: "static"
         },
         domains: {
-            subdomain: `https://${name.toLowerCase()}.veren.site`,
+            subdomain: `https://${projectName.toLowerCase()}.veren.site`,
         },
         createdBy: req.user?.id
     }
+
     let project;
     try {
-        project = await Project.create(projectData)
+        project = await Project.create(projectData);
     } catch (error: any) {
+        logger.info("INSIDE MONGO ERROR CATCHED", error.message)
         if (error.code == 11000) {
-            logger.info("INSIDE MONGO ERROR CATCHED", error.message)
             return res.status(409).json({
                 error: "Project name already taken"
             })
         }
-        logger.info("INSIDE MONGO ERROR CATCHED", error.message)
-        throw new ApiError(500, "Internal server error");
+        throw new ApiError(500, "Internal Server Error");
     }
 
     if (!project) {
         logger.info("Not of project error")
-        throw new ApiError(500, "Unable to Create Project At the moment.");
+        throw new ApiError(500, "Unable to Create Project at the moment.")
     }
 
     return res.status(201).json(
-        new ApiResponse(201, {success: true, project},"Project created successfully")
+        new ApiResponse(201, { sucess: true, project }, "Project created Successfully")
+    )
+})
+
+const createBackendProject = asyncHandler(async (req: Request, res: Response) => {
+    const {
+        projectName,
+        type = "backend",
+        gitUrl,
+        branch,
+        version,
+        entryDirectory,
+        installCommand,
+        runCommand,
+    } = req.body;
+
+    const projectData = {
+        name: projectName.toLowerCase(),
+        type: type,
+        git: {
+            provider: "github",
+            repoUrl: gitUrl,
+            branch,
+            rootDir: "./"
+        },
+        backendBuild: {
+            installCommand,
+            runCommand,
+            version
+        },
+        entryDirectory,
+        envs: [],
+        runtime: {
+            type: "server"
+        },
+        domains: {
+            subdomain: `https://api-${projectName.toLowerCase()}.veren.site`,
+        },
+        createdBy: req.user?.id
+    }
+
+    let project;
+    try {
+        project = await Project.create(projectData);
+    } catch (error: any) {
+        logger.info("INSIDE MONGO ERROR CATCHED", error.message)
+        if (error.code == 11000) {
+            return res.status(409).json({
+                error: "Project name already taken"
+            })
+        }
+        throw new ApiError(500, "Internal Server Error");
+    }
+
+    if (!project) {
+        logger.info("Not of project error")
+        throw new ApiError(500, "Unable to Create Project at the moment.")
+    }
+
+    return res.status(201).json(
+        new ApiResponse(201, { sucess: true, project }, "Project created Successfully")
     )
 })
 
@@ -95,9 +138,9 @@ const getAllProjects = asyncHandler(async (req: Request, res: Response) => {
     const projects = await Project.find({ createdBy: userId })
         .select({
             name: 1,
-            "domains.subdomain":1,
+            "domains.subdomain": 1,
             createdBy: 1,
-            _id:1
+            _id: 1
         })
         .populate({
             path: "createdBy",
@@ -129,10 +172,10 @@ const updateProjectConfigUser = asyncHandler(async (req: Request, res: Response)
 
 })
 
-const deleteProject = asyncHandler(async (req:Request, res:Response)=>{
-    
+const deleteProject = asyncHandler(async (req: Request, res: Response) => {
+
 })
 
 export {
-    createProject, getAllProjects, getProjectConfigUser,
+    createBackendProject, createFrontendProject, getAllProjects, getProjectConfigUser,
 }

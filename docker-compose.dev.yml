@@ -17,23 +17,21 @@ services:
 
   routing-service:
     build:
-      context: ./routing-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./routing-service/Dockerfile.dev
     container_name: routing-service
     volumes:
       - ./routing-service:/src
-      - clones-data:/src/src/clones
     ports:
       - "8004:3000"
     env_file:
       - ./routing-service/.env
-    command: [ "npm", "run", "dev" ]
     networks:
       - veren 
   orchestrate-service:
     build:
-      context: ./orchestrate-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./orchestrate-service/Dockerfile.dev
     container_name: orchestrate-service
     volumes:
       - ./orchestrate-service:/src
@@ -46,8 +44,8 @@ services:
       - veren  
   notification-service:
     build:
-      context: ./notification-service
-      dockerfile: Dockerfile.dev
+      context: .
+      dockerfile: ./notification-service/Dockerfile.dev
     container_name: notification-service
     volumes:
       - ./notification-service:/src
@@ -58,29 +56,42 @@ services:
     networks:
       - veren
 
-  clone-worker:
+  frontend-build-worker:
     build:
       context: .
-      dockerfile: ./WORKERS/clone-worker/Dockerfile
-    volumes:
-      - clones-data:/src/clone-worker/src/clones
-    env_file:
-      - ./WORKERS/clone-worker/.env
-    networks:
-      - veren
-    depends_on:
-      - internal-redis
-
-  build-worker:
-    build:
-      context: .
-      dockerfile: ./WORKERS/build-worker/Dockerfile
+      dockerfile: ./WORKERS/frontend-build-worker/Dockerfile
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - clones-data:/src/build-worker/src/clones
     env_file:
-      - ./WORKERS//build-worker/.env
+      - ./WORKERS/frontend-build-worker/.env
+    networks:
+      - veren
+    depends_on:
+      - internal-redis  
+
+  backend-build-worker:
+    build:
+      context: .
+      dockerfile: ./WORKERS/backend-build-worker/Dockerfile
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - ./WORKERS/backend-build-worker/.env
+    networks:
+      - veren
+    depends_on:
+      - internal-redis 
+  backend-deploy-worker:
+    build:
+      context: .
+      dockerfile: ./WORKERS/backend-deploy-worker/Dockerfile
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    env_file:
+      - ./WORKERS/backend-deploy-worker/.env
     networks:
       - veren
     depends_on:
@@ -96,9 +107,6 @@ services:
     - redis-data:/data
 
 volumes:
-  pgdata:
-  dind-storage:
-  clones-data:
   redis-data:
 
 networks:

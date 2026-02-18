@@ -1,8 +1,7 @@
-import { Queue } from "bullmq";
+import { ConnectionOptions, Queue } from "bullmq";
 import { Redis } from "ioredis";
 
-const connection = new Redis({
-    host: process.env.REDIS_HOST || 'internal-redis'
-})
+const redis = new Redis({ host: "internal-redis", port: 6379, maxRetriesPerRequest: null });
+const connection: ConnectionOptions = redis as unknown as ConnectionOptions;
 
 export const backendDeployQueue = new Queue('backendDeployQueue', { connection });

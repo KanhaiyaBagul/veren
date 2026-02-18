@@ -1,7 +1,8 @@
 import { Router } from "express"
 import { verifyJwt } from "../middlewares/auth.middlewares.js";
 import {
-    createProject,
+    createBackendProject,
+    createFrontendProject,
     getProjectConfigUser,
     // updateProjectConfigUser,
     getAllProjects
@@ -10,8 +11,12 @@ import { updateEnv } from "../controllers/env.controller.js";
 const router = Router()
 
 /*  IT IS FOR USER ACCESS ONLY  */
-router.route("/")
-    .post(verifyJwt, createProject)
+router.route("/f")
+    .post(verifyJwt, createFrontendProject)
+    .get(verifyJwt, getAllProjects)
+    
+router.route("/b")
+    .post(verifyJwt, createBackendProject)
     .get(verifyJwt, getAllProjects)
 
 router.route("/:projectId")

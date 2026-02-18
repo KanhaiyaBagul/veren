@@ -48,7 +48,6 @@ import AuthHandler from "./routes/auth.route.js";
 import RepoHandler from "./routes/repo.route.js";
 import DeploymentController from "./routes/deployment.route.js";
 import ProjectController from "./routes/projects.route.js";
-import RouteHandler from "./routes/router.route.js";
 import InternalRouteHandler from "./routes/internalService.route.js"
 
 // Routes Forwarding
@@ -65,12 +64,8 @@ app.use("/api/v1/internal", InternalRouteHandler)
 // WORKER    -    Deploy - handles routing inside system
 app.use("/api/v1/deployment", DeploymentController)
 
-
 // Checks detaiks regarding repository
 app.use("/api/v1/repo", RepoHandler)
-
-// reverse-proxy
-app.use("/api/v1/route", RouteHandler)
 
 app.use(errorHandler)
 

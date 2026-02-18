@@ -4,16 +4,19 @@ interface Env {
     key: string,
     value: string
 }
-
+export type ProjectType = "frontend" | "backend";
 interface RuntimeConfig {
   rType: "static" | "server";
   port?: number;
 }
 
 export interface IProject {
+
     _id?: Types.ObjectId;
 
     name: string,
+
+    type: ProjectType,
 
     git: {
         provider: "github";
@@ -21,36 +24,41 @@ export interface IProject {
         branch: string;
         rootDir?: string;
     }
+
     envs: {
-        frontendEnv: Env[],
-        backendEnv: Env[]
-    },
-    repoPath: {
-        frontendDirPath: string;
-        backendDirPath: string;
-    },
+        type: Env[]
+    }
+
+    entryDirectory: string;
     domains: {
         subdomain: string;
-        customDomain?: string;
     }
-    build: {
-        framework?: string;
-        frontendBuildCommand?: string;
-        frontendInstallCommand?: string;
-        backendInstallCommand?: string;
-        frontendOutDir: string;
-        backendStartCommand: string
 
+    frontendBuild: {
+        installCommand?: string;
+        buildCommand?: string;
+        outDir?: string;
+        version: number
     },
-    runtime: {
-        frontend: RuntimeConfig;
-        backend: RuntimeConfig;
-    };
+
+    backendBuild: {
+        installCommand?: string;
+        runCommand?: string;
+        version: number
+    },
+
+    runtime: RuntimeConfig;
+
     status: "active" | "paused" | "deleted"
+
     deployments: Types.ObjectId[];
+
     currentDeployment: Types.ObjectId;
+
     createdBy: Types.ObjectId;
+
     createdAt: Date;
+
     updatedAt: Date;
 }
 

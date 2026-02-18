@@ -1,17 +1,17 @@
 import { Request, Response } from "express";
 import asyncHandler from "../utils/api-utils/asyncHandler.js";
 import ApiError from "../utils/api-utils/ApiError.js";
-import {Project} from "@veren/domain";
+import { Project } from "@veren/domain";
 
 const updateEnv = asyncHandler(async (req: Request, res: Response) => {
     const { projectId } = req.params;
-    const { frontendEnv, backendEnv } = req.body;
+    const { envs } = req.body;
 
     if (!projectId) {
-        throw new ApiError(500, "Internal Server Error");
+        throw new ApiError(404, "Data not found");
     }
 
-    if (!frontendEnv || !backendEnv) {
+    if (!envs) {
         throw new ApiError(404, "Data not found");
     }
     try {
@@ -19,9 +19,7 @@ const updateEnv = asyncHandler(async (req: Request, res: Response) => {
         const updatedProject = await Project.findByIdAndUpdate(
             projectId,
             {
-                //  ... here makes envs.frontendEnv a key of its parent Object and its value is set to FrontendEnv
-                ...(frontendEnv && { "envs.frontendEnv": frontendEnv }),
-                ...(backendEnv && { "envs.backendEnv": backendEnv })
+                envs
             },
             {
                 new: true
